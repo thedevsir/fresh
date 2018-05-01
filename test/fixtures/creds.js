@@ -2,7 +2,7 @@
 const Slug = require('slug');
 
 const Account = require('../../server/modules/account');
-const Admin = require('../../server/modules/admin');
+const Admin = require('../../server/modules/admin-manage');
 const Session = require('../../server/modules/session');
 const User = require('../../server/modules/user');
 

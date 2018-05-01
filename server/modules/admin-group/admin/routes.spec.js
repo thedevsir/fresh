@@ -9,12 +9,12 @@ const {
     it
 } = exports.lab = require('lab').script();
 
-const Manifest = require('../../../manifest');
-const Fixtures = require('../../../test/fixtures');
+const Manifest = require('../../../../manifest');
+const Fixtures = require('../../../../test/fixtures');
 
-const Auth = require('../../auth');
+const Auth = require('../../../auth');
 
-const AdminGroup = require('./admin-group');
+const AdminGroup = require('../admin-group');
 
 const AdminGroups = require('./routes');
 
