@@ -1,0 +1,13 @@
+{
+    "extends": "hapi",
+    "parserOptions": {
+        "ecmaVersion": 2017,
+        "ecmaFeatures": {
+            "experimentalObjectRestSpread": true
+        }
+    },
+    "rules": {
+        "arrow-parens": ["error", "as-needed", { "requireForBlockBody": true }],
+        "brace-style": ["error", "1tbs"]
+    }
+}
