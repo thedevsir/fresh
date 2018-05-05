@@ -83,7 +83,7 @@ const register = function (server, serverOptions) {
         },
         handler: async ({ payload, route, auth }, h) => {
 
-            const { uploader } = server.plugins['@ecmacommunity/hapi-darwin'];
+            const { uploader } = server.plugins['hapi-darwin'];
 
             try {
                 await uploader(payload.avatar, {
@@ -126,7 +126,7 @@ module.exports = {
         'auth',
         'hapi-auth-basic',
         'hapi-mongo-models',
-        '@ecmacommunity/hapi-darwin'
+        'hapi-darwin'
     ],
     register
 };

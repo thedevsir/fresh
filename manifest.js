@@ -64,6 +64,9 @@ const prodPlugins = [];
 
 const commonPlugins = [
     {
+        plugin: 'hapi-darwin'
+    },
+    {
         plugin: 'hapi-auth-basic'
     },
     {
@@ -84,9 +87,6 @@ const commonPlugins = [
             ],
             autoIndex: Config.get('/hapiMongoModels/autoIndex')
         }
-    },
-    {
-        plugin: '@ecmacommunity/hapi-darwin'
     },
     {
         plugin: './server/auth'

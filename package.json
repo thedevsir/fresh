@@ -16,7 +16,6 @@
     "node": "9.x.x"
   },
   "dependencies": {
-    "@ecmacommunity/hapi-darwin": "1.x.x",
     "bcryptjs": "2.x.x",
     "boom": "7.x.x",
     "confidence": "3.x.x",
@@ -26,6 +25,7 @@
     "handlebars": "4.x.x",
     "hapi": "17.x.x",
     "hapi-auth-basic": "5.x.x",
+    "hapi-darwin": "1.1.1",
     "hapi-mongo-models": "7.x.x",
     "hapi-remote-address": "1.x.x",
     "hoek": "5.x.x",

@@ -438,7 +438,7 @@ describe('PUT /accounts/{id}/avatar', () => {
         findById = Sinon.stub(Account, 'findById')
             .onFirstCall().resolves(undefined)
             .resolves({});
-        uploader = Sinon.stub(server.plugins['@esforever/hapi-darwin'], 'uploader')
+        uploader = Sinon.stub(server.plugins['hapi-darwin'], 'uploader')
             .onFirstCall().rejects()
             .resolves({});
     });

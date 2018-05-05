@@ -131,7 +131,7 @@ describe('PUT /accounts/my/avatar', () => {
 
     before(() => {
 
-        uploader = Sinon.stub(server.plugins['@esforever/hapi-darwin'], 'uploader')
+        uploader = Sinon.stub(server.plugins['hapi-darwin'], 'uploader')
             .onFirstCall().rejects()
             .resolves({});
     });
