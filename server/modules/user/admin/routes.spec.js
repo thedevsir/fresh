@@ -16,11 +16,10 @@ const Auth = require('../../../auth');
 
 const User = require('../user');
 
-const Users = require('../routes');
+const Users = require('./routes');
 
 let server;
 let rootCredentials;
-let accountCredentials;
 
 before(async () => {
 
@@ -42,7 +41,7 @@ before(async () => {
     await server.start();
     await Fixtures.Db.removeAllData();
 
-    [rootCredentials, accountCredentials] = await Promise.all([
+    [rootCredentials] = await Promise.all([
         Fixtures.Creds.createRootAdminUser(),
         Fixtures.Creds.createAccountUser('Stimpson Cat', 'stimpy', 'goodcat', 'stimpy@ren.show'),
         Fixtures.Creds.createAdminUser('Ren Hoek', 'ren', 'baddog', 'ren@stimpy.show')
@@ -328,112 +327,5 @@ describe('PUT /users/{id}/password', () => {
         expect(response.statusCode).to.equal(200);
         expect(response.result).to.be.an.object();
         expect(response.result.username).to.equal('finally');
-    });
-});
-
-describe('GET /users/my', () => {
-
-    let request;
-
-    beforeEach(() => {
-
-        request = {
-            method: 'GET',
-            url: '/users/my',
-            credentials: accountCredentials
-        };
-    });
-
-    it('should return HTTP 200 when all is well', async () => {
-
-        const response = await server.inject(request);
-
-        expect(response.statusCode).to.equal(200);
-        expect(response.result).to.be.an.object();
-        expect(response.result.username).to.equal('stimpy');
-    });
-});
-
-describe('PUT /users/my', () => {
-
-    let request;
-
-    beforeEach(() => {
-
-        request = {
-            method: 'PUT',
-            url: '/users/my',
-            credentials: accountCredentials
-        };
-    });
-
-    it('should return HTTP 409 when the username is already in use', async () => {
-
-        request.url = request.url.replace(/{id}/, '555555555555555555555555');
-        request.payload = {
-            email: 'ren@stimpy.show',
-            username: 'ren'
-        };
-
-        const response = await server.inject(request);
-
-        expect(response.statusCode).to.equal(409);
-        expect(response.result.message).to.match(/username already in use/i);
-    });
-
-    it('should return HTTP 409 when the email is already in use', async () => {
-
-        request.url = request.url.replace(/{id}/, '555555555555555555555555');
-        request.payload = {
-            email: 'ren@stimpy.show',
-            username: 'pleasesteve'
-        };
-
-        const response = await server.inject(request);
-
-        expect(response.statusCode).to.equal(409);
-        expect(response.result.message).to.match(/email already in use/i);
-    });
-
-    it('should return HTTP 200 when all is well', async () => {
-
-        request.payload = {
-            email: 'stimpy@gmail.gov',
-            username: 'stimpson'
-        };
-
-        const response = await server.inject(request);
-
-        expect(response.statusCode).to.equal(200);
-        expect(response.result).to.be.an.object();
-        expect(response.result.username).to.equal('stimpson');
-        expect(response.result.email).to.equal('stimpy@gmail.gov');
-    });
-});
-
-describe('PUT /users/my/password', () => {
-
-    let request;
-
-    beforeEach(() => {
-
-        request = {
-            method: 'PUT',
-            url: '/users/my/password',
-            credentials: accountCredentials
-        };
-    });
-
-    it('should return HTTP 200 when all is well', async () => {
-
-        request.payload = {
-            password: '53cur3p455'
-        };
-
-        const response = await server.inject(request);
-
-        expect(response.statusCode).to.equal(200);
-        expect(response.result).to.be.an.object();
-        expect(response.result.username).to.equal('stimpson');
     });
 });
