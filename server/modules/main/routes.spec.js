@@ -9,7 +9,7 @@ const {
     it
 } = exports.lab = require('lab').script();
 
-const Main = require('./routes').default;
+const Main = require('./routes');
 
 let server;
 
