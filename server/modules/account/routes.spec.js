@@ -115,21 +115,16 @@ describe('PUT /accounts/my', () => {
 describe('PUT /accounts/my/avatar', () => {
 
     let uploader;
-
-    const _id = createModelId(Account);
+    let request;
     const avatar = '0000';
 
-    const request = {
-        method: 'PUT',
-        url: `/accounts/my/avatar`,
-        credentials: {
-            roles: {
-                account: { _id }
-            }
-        }
-    };
-
     before(() => {
+
+        request = {
+            method: 'PUT',
+            url: `/accounts/my/avatar`,
+            credentials: accountCredentials
+        };
 
         uploader = Sinon.stub(server.plugins['hapi-darwin'], 'uploader')
             .onFirstCall().rejects()
@@ -152,7 +147,7 @@ describe('PUT /accounts/my/avatar', () => {
         const { statusCode, result } = await server.inject(request);
 
         Sinon.assert.calledOnce(uploader);
-        Sinon.assert.calledWith(uploader.firstCall, avatar);
+        Sinon.assert.calledWith(uploader.firstCall, avatar);        
 
         expect(statusCode).to.equal(400);
         expect(result.message).to.match(/invalid file/i);
@@ -171,19 +166,15 @@ describe('PUT /accounts/my/avatar', () => {
 describe('DELETE /accounts/my/avatar', () => {
 
     let del;
-
-    const _id = createModelId(Account);
-    const request = {
-        method: 'DELETE',
-        url: `/accounts/my/avatar`,
-        credentials: {
-            roles: {
-                account: { _id }
-            }
-        }
-    };
+    let request;
 
     before(() => {
+
+        request = {
+            method: 'DELETE',
+            url: `/accounts/my/avatar`,
+            credentials: accountCredentials
+        };
 
         del = Sinon.stub(Del, 'sync');
     });

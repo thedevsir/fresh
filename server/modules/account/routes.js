@@ -93,7 +93,7 @@ const register = function (server, serverOptions) {
                     versions: [{ width: 150, height: 150 }]
                 });
             } catch (err) {
-                throw Boom.badRequest(err);
+                throw Boom.badRequest('Invalid file.');
             }
 
             return { message: 'Success.' };
