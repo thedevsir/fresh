@@ -25,27 +25,29 @@ class Preware {
         };
     };
 
-    static requireAdminHavePermission(permission) {
+    static requireAdminHavePermission(permissions) {
 
         return {
             assign: 'ensureAdminHavePermission',
             method: function (request, h) {
 
+                if (Object.prototype.toString.call(permissions) !== '[object Array]') {
+                    permissions = [permissions];
+                }
+
                 const admin = request.auth.credentials.roles.admin;
-                admin.hasPermissionTo(permission, (err, result) => {
+                const permissionFound = permissions.some(permission => admin.hasPermissionTo(permission));
 
-                    if (err || !result) {
+                if (!permissionFound) {
+                    throw Boom.forbidden('Missing permissions.');
+                }
 
-                        throw Boom.forbidden('Missing permission.');
-                    }
-
-                    return h.continue;
-                });
+                return h.continue;
             }
         };
     }
 
-    static requireRootOrHavePermission(permission) {
+    static requireRootOrHavePermission(permissions) {
 
         return {
             assign: 'ensureRootOrHavePermission',
@@ -58,15 +60,17 @@ class Preware {
                     return h.continue;
                 }
 
-                admin.hasPermissionTo(permission, (err, result) => {
+                if (Object.prototype.toString.call(permissions) !== '[object Array]') {
+                    permissions = [permissions];
+                }
 
-                    if (err || !result) {
+                const permissionFound = permissions.some(permission => admin.hasPermissionTo(permission));
 
-                        throw Boom.forbidden('Missing permission.');
-                    }
+                if (!permissionFound) {
+                    throw Boom.forbidden('Missing permissions.');
+                }
 
-                    return h.continue;
-                });
+                return h.continue;
             }
         };
     }
