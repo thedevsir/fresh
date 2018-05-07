@@ -25,6 +25,52 @@ class Preware {
         };
     };
 
+    static requireAdminHavePermission(permission) {
+
+        return {
+            assign: 'ensureAdminHavePermission',
+            method: function (request, h) {
+
+                const admin = request.auth.credentials.roles.admin;
+                admin.hasPermissionTo(permission, (err, result) => {
+
+                    if (err || !result) {
+
+                        throw Boom.forbidden('Missing permission.');
+                    }
+
+                    return h.continue;
+                });
+            }
+        };
+    }
+
+    static requireRootOrHavePermission(permission) {
+
+        return {
+            assign: 'ensureRootOrHavePermission',
+            method: function (request, h) {
+
+                const admin = request.auth.credentials.roles.admin;
+                const root = admin.isMemberOf('root');
+
+                if (root) {
+                    return h.continue;
+                }
+
+                admin.hasPermissionTo(permission, (err, result) => {
+
+                    if (err || !result) {
+
+                        throw Boom.forbidden('Missing permission.');
+                    }
+
+                    return h.continue;
+                });
+            }
+        };
+    }
+
     static requireVerifiedUser() {
 
         return {
