@@ -14,14 +14,10 @@ const {
     it
 } = exports.lab = require('lab').script();
 
-const { createModelId } = require('../../../test/utils');
-
 const Manifest = require('../../../manifest');
 const Fixtures = require('../../../test/fixtures');
 
 const Auth = require('../../auth');
-
-const Account = require('./account');
 
 const Accounts = require('./routes');
 
@@ -147,7 +143,7 @@ describe('PUT /accounts/my/avatar', () => {
         const { statusCode, result } = await server.inject(request);
 
         Sinon.assert.calledOnce(uploader);
-        Sinon.assert.calledWith(uploader.firstCall, avatar);        
+        Sinon.assert.calledWith(uploader.firstCall, avatar);
 
         expect(statusCode).to.equal(400);
         expect(result.message).to.match(/invalid file/i);

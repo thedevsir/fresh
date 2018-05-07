@@ -44,7 +44,7 @@ lab.experiment('AuthAttempt Model', () => {
     lab.test('it detects login abuse from an ip and many users', async () => {
 
         const attemptConfig = Config.get('/authAttempts');
-        const authRequest = (i) => AuthAttempt.create('127.0.0.2', `mudskipper${i}`);
+        const authRequest = i => AuthAttempt.create('127.0.0.2', `mudskipper${i}`);
         const authSpam = Array(attemptConfig.forIp).fill().map((_, i) => authRequest(i));
 
         await Promise.all(authSpam);
@@ -59,7 +59,7 @@ lab.experiment('AuthAttempt Model', () => {
 
         const attemptConfig = Config.get('/authAttempts');
         const authRequest = () => AuthAttempt.create('127.0.0.3', 'steve');
-        const authSpam = Array(attemptConfig.forIpAndUser).fill().map((_) => authRequest());
+        const authSpam = Array(attemptConfig.forIpAndUser).fill().map(_ => authRequest());
 
         await Promise.all(authSpam);
 
