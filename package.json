@@ -7,7 +7,7 @@
     "start": "cross-env NODE_ENV=development nodemon -e js,md server.js",
     "inspect": "cross-env NODE_ENV=development nodemon --inspect -e js,md server.js",
     "first-time-setup": "node first-time-setup.js",
-    "test": "lab -c -L --pattern '.spec' server",
+    "test": "lab -c -L --pattern '.spec' --timeout 4000 server",
     "test-server": "lab -c -L -v $TEST_TARGET"
   },
   "author": "ECMA Community <escommunity.ir>",
