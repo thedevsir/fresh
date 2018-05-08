@@ -29,14 +29,30 @@ class Preware {
 
         return {
             assign: 'ensureAdminHavePermission',
-            method: function (request, h) {
+            method: async function (request, h) {
 
                 if (Object.prototype.toString.call(permissions) !== '[object Array]') {
                     permissions = [permissions];
                 }
 
+                let permissionFound = false;
                 const admin = request.auth.credentials.roles.admin;
-                const permissionFound = permissions.some(permission => admin.hasPermissionTo(permission));
+
+                await new Promise((resolve) => {
+
+                    permissions.forEach(async (permission, idx, array) => {
+
+                        if (await admin.hasPermissionTo(permission)) {
+
+                            permissionFound = true;
+                            return resolve();
+                        }
+
+                        if (idx === array.length - 1) {
+                            resolve();
+                        }
+                    });
+                });
 
                 if (!permissionFound) {
                     throw Boom.forbidden('Missing permissions.');
@@ -51,7 +67,7 @@ class Preware {
 
         return {
             assign: 'ensureRootOrHavePermission',
-            method: function (request, h) {
+            method: async function (request, h) {
 
                 const admin = request.auth.credentials.roles.admin;
                 const root = admin.isMemberOf('root');
@@ -64,7 +80,23 @@ class Preware {
                     permissions = [permissions];
                 }
 
-                const permissionFound = permissions.some(permission => admin.hasPermissionTo(permission));
+                let permissionFound = false;
+
+                await new Promise((resolve) => {
+
+                    permissions.forEach(async (permission, idx, array) => {
+
+                        if (await admin.hasPermissionTo(permission)) {
+
+                            permissionFound = true;
+                            return resolve();
+                        }
+
+                        if (idx === array.length - 1) {
+                            resolve();
+                        }
+                    });
+                });
 
                 if (!permissionFound) {
                     throw Boom.forbidden('Missing permissions.');
