@@ -57,7 +57,7 @@ class Credentials {
         };
     }
 
-    static async createAdminUser(name, username, password, email, groups = []) {
+    static async createAdminUser(name, username, password, email, groups = [], permissions = []) {
 
         let [admin, user, session] = await Promise.all([
             Admin.create(name),
@@ -69,6 +69,12 @@ class Credentials {
                 groups: groups.reduce((accumulator, group) => {
 
                     accumulator[Slug(group).toLowerCase()] = group;
+
+                    return accumulator;
+                }, {}),
+                permissions: permissions.reduce((accumulator, permission) => {
+
+                    accumulator[Slug(permission).toLowerCase()] = true;
 
                     return accumulator;
                 }, {}),
