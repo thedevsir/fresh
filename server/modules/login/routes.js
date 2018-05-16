@@ -10,6 +10,8 @@ const AuthAttempt = require('./auth-attempt');
 const Session = require('../session');
 const User = require('../user');
 
+const Jwt = require('jsonwebtoken');
+
 const register = function (server, serverOptions) {
 
     server.route({
@@ -67,22 +69,22 @@ const register = function (server, serverOptions) {
                 }
             }]
         },
-        handler: function (request, h) {
+        handler: function ({ pre }, h) {
 
-            const sessionId = request.pre.session._id;
-            const sessionKey = request.pre.session.key;
-            const credentials = `${sessionId}:${sessionKey}`;
-            const authHeader = `Basic ${new Buffer(credentials).toString('base64')}`;
+            const { secret, algorithm } = Config.get('/jwt');
+
+            const { _id: uid, username, isActive } = pre.user;
+            const { _id: sid, key } = pre.session;
+
+            const credentials = {
+                scope: Object.keys(pre.user.roles),
+                roles: pre.user.roles,
+                session: { key, _id: sid },
+                user: { username, isActive, _id: uid }
+            };
 
             return {
-                user: {
-                    _id: request.pre.user._id,
-                    username: request.pre.user.username,
-                    email: request.pre.user.email,
-                    roles: request.pre.user.roles
-                },
-                session: request.pre.session,
-                authHeader
+                authorization: Jwt.sign(credentials, secret, { algorithm })
             };
         }
     });

@@ -98,13 +98,11 @@ describe('POST /login', () => {
 
     it('should return HTTP 200 when all is well', async () => {
 
-        const response = await server.inject(request);
+        const response = await server.inject(request); 
 
         expect(response.statusCode).to.equal(200);
         expect(response.result).to.be.an.object();
-        expect(response.result.user).to.be.an.object();
-        expect(response.result.session).to.be.an.object();
-        expect(response.result.authHeader).to.be.a.string();
+        expect(response.result.authorization).to.be.a.string();
     });
 });
 
