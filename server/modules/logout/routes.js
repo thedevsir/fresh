@@ -31,7 +31,7 @@ module.exports = {
     name: 'api-logout',
     dependencies: [
         'auth',
-        'hapi-auth-basic',
+        'hapi-auth-jwt2',
         'hapi-mongo-models'
     ],
     register

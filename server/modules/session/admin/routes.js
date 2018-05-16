@@ -93,7 +93,7 @@ module.exports = {
     name: 'api-admin-sessions',
     dependencies: [
         'auth',
-        'hapi-auth-basic',
+        'hapi-auth-jwt2',
         'hapi-mongo-models'
     ],
     register

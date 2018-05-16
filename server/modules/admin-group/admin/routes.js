@@ -197,7 +197,7 @@ module.exports = {
     name: 'api-admin-groups',
     dependencies: [
         'auth',
-        'hapi-auth-basic',
+        'hapi-auth-jwt2',
         'hapi-mongo-models'
     ],
     register

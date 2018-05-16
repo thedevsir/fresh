@@ -124,7 +124,7 @@ module.exports = {
     name: 'api-accounts',
     dependencies: [
         'auth',
-        'hapi-auth-basic',
+        'hapi-auth-jwt2',
         'hapi-mongo-models',
         'hapi-darwin'
     ],

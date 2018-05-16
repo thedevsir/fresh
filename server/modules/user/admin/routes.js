@@ -279,7 +279,7 @@ module.exports = {
     name: 'api-admin-users',
     dependencies: [
         'auth',
-        'hapi-auth-basic',
+        'hapi-auth-jwt2',
         'hapi-mongo-models'
     ],
     register

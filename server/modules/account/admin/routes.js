@@ -451,7 +451,7 @@ module.exports = {
     name: 'api-admin-accounts',
     dependencies: [
         'auth',
-        'hapi-auth-basic',
+        'hapi-auth-jwt2',
         'hapi-mongo-models',
         'hapi-darwin'
     ],

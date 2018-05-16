@@ -152,7 +152,7 @@ module.exports = {
     name: 'api-admin-statuses',
     dependencies: [
         'auth',
-        'hapi-auth-basic',
+        'hapi-auth-jwt2',
         'hapi-mongo-models'
     ],
     register

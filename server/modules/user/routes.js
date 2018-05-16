@@ -148,7 +148,7 @@ module.exports = {
     name: 'api-users',
     dependencies: [
         'auth',
-        'hapi-auth-basic',
+        'hapi-auth-jwt2',
         'hapi-mongo-models'
     ],
     register
