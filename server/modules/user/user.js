@@ -134,6 +134,7 @@ class User extends MongoModels {
         return this.roles.hasOwnProperty(role);
     }
 
+    // Never used
     async hydrateRoles() {
 
         if (this._roles) {
