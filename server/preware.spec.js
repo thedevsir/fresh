@@ -34,7 +34,7 @@ describe('Preware', () => {
         await server.start();
         await Fixtures.Db.removeAllData();
 
-        const auth = { strategy: 'simple', scope: 'admin' };
+        const auth = { strategy: 'advanced', scope: 'admin' };
         const handler = (request, h) => ({ message: 'ok' });
 
         server.route({
