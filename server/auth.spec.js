@@ -7,10 +7,9 @@ const Manifest = require('../manifest');
 const Fixtures = require('../test/fixtures');
 
 const Auth    = require('./auth');
-const User    = require('./modules/user');
 const Session = require('./modules/session');
 
-describe('Simple Auth Strategy', () => {
+describe('Advanced Auth Strategy', () => {
 
     let server;
 
@@ -42,7 +41,7 @@ describe('Simple Auth Strategy', () => {
             handler: async function (request, h) {
 
                 try {
-                    await request.server.auth.test('simple', request);
+                    await request.server.auth.test('advanced', request);
 
                     return { isValid: true };
                 } catch (err) {
@@ -70,7 +69,7 @@ describe('Simple Auth Strategy', () => {
         expect(response.result.isValid).to.equal(false);
     });
 
-    it('should return as invalid when the session query misses', async () => {
+    it('should return as invalid when the authentication is fake', async () => {
 
         const sessionId = '000000000000000000000001';
         const sessionKey = '01010101-0101-0101-0101-010101010101';
@@ -88,56 +87,9 @@ describe('Simple Auth Strategy', () => {
         expect(response.result.isValid).to.equal(false);
     });
 
-    it('should return as invalid when the user query misses', async () => {
-
-        const session = await Session.create('000000000000000000000000', '127.0.0.1', 'Lab');
-        const request = {
-            method: 'GET',
-            url: '/',
-            headers: {
-                authorization: Fixtures.Creds.authHeader(session._id, session.key)
-            }
-        };
-        const response = await server.inject(request);
-
-        expect(response.statusCode).to.equal(200);
-        expect(response.result.isValid).to.equal(false);
-    });
-
-    it('should return as invalid when the user is not active', async () => {
-
-        const { user } = await Fixtures.Creds.createAdminUser(
-            'Ben Hoek', 'ben', 'badben', 'ben@stimpy.show'
-        );
-        const session = await Session.create(`${user._id}`, '127.0.0.1', 'Lab');
-        const update = {
-            $set: {
-                isActive: false
-            }
-        };
-
-        await User.findByIdAndUpdate(user._id, update);
-
-        const request = {
-            method: 'GET',
-            url: '/',
-            headers: {
-                authorization: Fixtures.Creds.authHeader(session._id, session.key)
-            }
-        };
-
-        const response = await server.inject(request);
-
-        expect(response.statusCode).to.equal(200);
-        expect(response.result.isValid).to.equal(false);
-    });
-
     it('should return as valid when all is well', async () => {
 
-        const { user } = await Fixtures.Creds.createAdminUser(
-            'Ren Hoek', 'ren', 'baddog', 'ren@stimpy.show'
-        );
-        const session = await Session.create(`${user._id}`, '127.0.0.1', 'Lab');
+        const session = await Session.create('000000000000000000000000', '127.0.0.1', 'Lab');
 
         const request = {
             method: 'GET',

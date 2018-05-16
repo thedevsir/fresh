@@ -1,14 +1,23 @@
 'use strict';
 const Session = require('./modules/session');
-const User = require('./modules/user');
+
+const Config = require('../config');
 
 const register = function (server, options) {
 
-    server.auth.strategy('simple', 'basic',
-        {
-            validate: async function (request, sessionId, key, h) {
+    const { secret, algorithm } = Config.get('/jwt');
 
-                const session = await Session.findByCredentials(sessionId, key);
+    server.auth.strategy('advanced', 'jwt',
+        {
+            key: secret,
+            verifyOptions: {
+                algorithms: [algorithm],
+                ignoreExpiration: true
+            },
+            validate: async function (credentials, request, h) {
+
+                const { _id: sid, key } = credentials.session;
+                const session = await Session.findByCredentials(sid, key);
 
                 if (!session) {
                     return { isValid: false };
@@ -16,36 +25,18 @@ const register = function (server, options) {
 
                 session.updateLastActive();
 
-                const user = await User.findById(session.userId);
-
-                if (!user) {
-                    return { isValid: false };
-                }
-
-                if (!user.isActive) {
-                    return { isValid: false };
-                }
-
-                const roles = await user.hydrateRoles();
-                const credentials = {
-                    scope: Object.keys(user.roles),
-                    roles,
-                    session,
-                    user
-                };
-
                 return { credentials, isValid: true };
             }
         }
     );
 
-    server.auth.default('simple');
+    server.auth.default('advanced');
 };
 
 module.exports = {
     name: 'auth',
     dependencies: [
-        'hapi-auth-basic',
+        'hapi-auth-jwt2',
         'hapi-mongo-models'
     ],
     register
