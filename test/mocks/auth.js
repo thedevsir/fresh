@@ -11,6 +11,6 @@ const register = (server) => {
 
 module.exports = {
     register,
-    dependencies: ['hapi-auth-basic'],
+    dependencies: ['hapi-auth-jwt2'],
     name: 'auth'
 };
