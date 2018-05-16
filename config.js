@@ -30,6 +30,14 @@ const config = {
         forIp: 50,
         forIpAndUser: 7
     },
+    jwt: {
+        secret: {
+            $filter: 'env',
+            production: process.env.JWT_SECRET,
+            $default: 'NeverShareYourSecret'
+        },
+        algorithm: 'HS256'
+    },
     hapiMongoModels: {
         mongodb: {
             connection: {
