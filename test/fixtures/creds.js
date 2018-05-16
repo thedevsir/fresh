@@ -6,13 +6,20 @@ const Admin = require('../../server/modules/admin-manage');
 const Session = require('../../server/modules/session');
 const User = require('../../server/modules/user');
 
+const Config = require('../../config');
+
+const Jwt = require('jsonwebtoken');
+
 class Credentials {
     static authHeader(username, password) {
 
-        const combo = `${username}:${password}`;
-        const combo64 = (new Buffer(combo)).toString('base64');
+        const { secret, algorithm } = Config.get('/jwt');
 
-        return `Basic ${combo64}`;
+        const credentials = {
+            session: { key: password, _id: username }
+        };
+
+        return Jwt.sign(credentials, secret, { algorithm });
     }
 
     static async createRootAdminUser() {
