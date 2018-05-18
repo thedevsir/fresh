@@ -13,14 +13,7 @@ const schema = Joi.object({
     email: Joi.string().email().lowercase().required(),
     isActive: Joi.boolean().default(true),
     password: Joi.string(),
-    resetPassword: Joi.object({
-        token: Joi.string().required(),
-        expires: Joi.date().required()
-    }),
-    verify: Joi.object({
-        token: Joi.string().required(),
-        expires: Joi.date().required()
-    }),
+    verify: Joi.boolean(),
     roles: Joi.object({
         admin: Joi.object({
             id: Joi.string().required(),
@@ -37,7 +30,7 @@ const schema = Joi.object({
 
 class User extends MongoModels {
 
-    static async create(username, password, email, verify) {
+    static async create(username, password, email) {
 
         Assert.ok(username, 'Missing username argument.');
         Assert.ok(password, 'Missing password argument.');
@@ -46,14 +39,11 @@ class User extends MongoModels {
         const passwordHash = await this.generatePasswordHash(password);
         const user = {
             email,
+            verify: false,
             isActive: true,
             password: passwordHash.hash,
             username
         };
-
-        if (verify) {
-            user.verify = verify;
-        }
 
         const document = new this(user);
         const users = await this.insertOne(document);
