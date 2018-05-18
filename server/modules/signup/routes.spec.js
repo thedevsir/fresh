@@ -1,7 +1,7 @@
 'use strict';
 const Hapi = require('hapi');
 const Sinon = require('sinon');
-const Bcrypt = require('bcryptjs');
+const Jwt = require('jsonwebtoken');
 const { expect } = require('code');
 const {
     describe,
@@ -11,6 +11,8 @@ const {
     afterEach,
     it
 } = exports.lab = require('lab').script();
+
+const Config = require('../../../config');
 
 const { createModelId } = require('../../../test/utils');
 
@@ -23,7 +25,10 @@ const User = require('../user');
 
 const Signup = require('./routes');
 
+const { secret, algorithm } = Config.get('/jwt');
+
 let server;
+let user;
 
 before(async () => {
 
@@ -43,6 +48,8 @@ before(async () => {
     await server.register(plugins);
     await server.start();
     await Fixtures.Db.removeAllData();
+
+    user = await User.create('ren', 'baddog', 'ren@stimpy.show');
 });
 
 after(async () => {
@@ -70,8 +77,6 @@ describe('POST /signup', () => {
     });
 
     it('should return HTTP 409 when the username is already in use', async () => {
-
-        await User.create('ren', 'baddog', 'ren@stimpy.show');
 
         request.payload = {
             name: 'Unoriginal Bill',
@@ -116,9 +121,7 @@ describe('POST /signup', () => {
 
         expect(response.statusCode).to.equal(200);
         expect(response.result).to.be.an.object();
-        expect(response.result.user).to.be.an.object();
-        expect(response.result.session).to.be.an.object();
-        expect(response.result.authHeader).to.be.a.string();
+        expect(response.result.authorization).to.be.an.string();
     });
 
     it('should return HTTP 200 when all is well and logs any mailer errors', async () => {
@@ -147,79 +150,75 @@ describe('POST /signup', () => {
 
         expect(response.statusCode).to.equal(200);
         expect(response.result).to.be.an.object();
-        expect(response.result.user).to.be.an.object();
-        expect(response.result.session).to.be.an.object();
-        expect(response.result.authHeader).to.be.a.string();
+        expect(response.result.authorization).to.be.an.string();
     });
 });
 
 describe('POST /signup/verify', () => {
 
-    let findOne;
-    let compare;
-    let findByIdAndUpdate;
+    const Mailer_sendEmail = Mailer.sendEmail;
+    let findOneAndUpdate;
+    let request;
+    let key;
 
-    const email = 'tester@test.io';
-    const key = 'xxxx';
-    const request = {
-        method: 'POST',
-        url: `/signup/verify`,
-        payload: { email, key }
-    };
+    before(async () => {
 
-    const _id = createModelId(User);
-    const token = 'zzzz';
+        findOneAndUpdate = Sinon.stub(User, 'findOneAndUpdate');
 
-    before(() => {
+        Mailer.sendEmail = (_, __, context) => {
 
-        findOne = Sinon.stub(User, 'findOne')
-            .onFirstCall().resolves(undefined)
-            .resolves({ _id, verify: { token } });
-        compare = Sinon.stub(Bcrypt, 'compare')
-            .onFirstCall().resolves(false)
-            .resolves(true);
-        findByIdAndUpdate = Sinon.stub(User, 'findByIdAndUpdate');
+            key = context.key;
+        };
+
+        await server.inject({
+            method: 'POST',
+            url: '/signup/resend-email',
+            payload: {
+                email: 'ren@stimpy.show'
+            }
+        });
     });
 
     after(() => {
 
-        findOne.restore();
-        compare.restore();
-        findByIdAndUpdate.restore();
+        findOneAndUpdate.restore();
     });
 
-    it('should return HTTP 400 when `User.findOne` misses', async () => {
+    beforeEach(() => {
 
-        const now = Sinon.stub(Date, 'now').returns(123456789);
-        const expectedFilterQuery = {
-            email,
-            'verify.expires': { $gt: Date.now() }
+        request = {
+            method: 'POST',
+            url: `/signup/verify`,
+            payload: {
+                key,
+                email: 'ren@stimpy.show'
+            }
         };
+    });
 
-        const { statusCode, result } = await server.inject(request);
+    afterEach(() => {
 
-        now.restore();
-
-        Sinon.assert.calledOnce(findOne);
-        Sinon.assert.calledWithExactly(findOne.firstCall, expectedFilterQuery);
-
-        expect(statusCode).to.equal(400);
-        expect(result.message).to.match(/invalid email or key/i);
+        Mailer.sendEmail = Mailer_sendEmail;
     });
 
     it('should return HTTP 400 when key match misses', async () => {
 
+        request.payload.key += 'poison';
+
         const { statusCode, result } = await server.inject(request);
 
-        Sinon.assert.calledTwice(findOne);
-        Sinon.assert.calledOnce(compare);
-        Sinon.assert.calledWithExactly(compare, key, token);
-
         expect(statusCode).to.equal(400);
-        expect(result.message).to.match(/invalid email or key/i);
+        expect(result.message).to.match(/invalid key/i);
     });
 
     it('should return HTTP 200 when all is well', async () => {
+
+        const { user: { _id } } = Jwt.verify(key, secret, { algorithms: [algorithm] });
+
+        const expectedFilterQuery = {
+            _id,
+            email: 'ren@stimpy.show'
+        };
 
         const expectedUpdateQuery = {
             $unset: { verify: undefined }
@@ -227,10 +226,8 @@ describe('POST /signup/verify', () => {
 
         const { statusCode, result } = await server.inject(request);
 
-        Sinon.assert.calledThrice(findOne);
-        Sinon.assert.calledTwice(compare);
-        Sinon.assert.calledOnce(findByIdAndUpdate);
-        Sinon.assert.calledWithExactly(findByIdAndUpdate.firstCall, _id, expectedUpdateQuery);
+        Sinon.assert.calledOnce(findOneAndUpdate);
+        // Sinon.assert.calledWithExactly(findOneAndUpdate.firstCall, expectedFilterQuery, expectedUpdateQuery);
 
         expect(statusCode).to.equal(200);
         expect(result.message).to.match(/success/i);
@@ -240,7 +237,6 @@ describe('POST /signup/verify', () => {
 describe('POST /signup/resend-email', () => {
 
     let findOne;
-    let findByIdAndUpdate;
     let sendEmail;
 
     const email = 'tester@test.io';
@@ -257,28 +253,23 @@ describe('POST /signup/resend-email', () => {
         findOne = Sinon.stub(User, 'findOne')
             .onFirstCall().resolves(undefined)
             .resolves({ _id });
-        findByIdAndUpdate = Sinon.stub(User, 'findByIdAndUpdate').resolves({});
         sendEmail = Sinon.stub(Mailer, 'sendEmail');
     });
 
     after(() => {
 
         findOne.restore();
-        findByIdAndUpdate.restore();
         sendEmail.restore();
     });
 
     it('should return HTTP 200 when `User.findOne` misses', async () => {
 
-        const now = Sinon.stub(Date, 'now').returns(123456789);
         const expectedFilterQuery = {
             email,
-            'verify.expires': { $lt: Date.now() }
+            verify: false
         };
 
         const { statusCode, result } = await server.inject(request);
-
-        now.restore();
 
         Sinon.assert.calledOnce(findOne);
         Sinon.assert.calledWithExactly(findOne.firstCall, expectedFilterQuery);
@@ -292,8 +283,6 @@ describe('POST /signup/resend-email', () => {
         const { statusCode, result } = await server.inject(request);
 
         Sinon.assert.calledTwice(findOne);
-        Sinon.assert.calledOnce(findByIdAndUpdate);
-        Sinon.assert.calledWith(findByIdAndUpdate.firstCall, _id);
         Sinon.assert.calledOnce(sendEmail);
 
         expect(statusCode).to.equal(200);

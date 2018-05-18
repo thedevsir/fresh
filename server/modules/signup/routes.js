@@ -1,6 +1,5 @@
 'use strict';
 const Boom = require('boom');
-const Bcrypt = require('bcryptjs');
 const Joi = require('joi');
 
 const Config = require('../../../config');
@@ -9,6 +8,10 @@ const Mailer = require('../../mailer');
 const User = require('../user');
 const Session = require('../session');
 const Account = require('../account');
+
+const Jwt = require('jsonwebtoken');
+
+const { secret, algorithm } = Config.get('/jwt');
 
 const register = function (server, serverOptions) {
 
@@ -56,18 +59,12 @@ const register = function (server, serverOptions) {
 
             // create and link account and user documents
 
-            const keyHash = await Session.generateKeyHash();
-
             let [account, user] = await Promise.all([
                 Account.create(request.payload.name),
                 User.create(
                     request.payload.username,
                     request.payload.password,
-                    request.payload.email,
-                    {
-                        token: keyHash.hash,
-                        expires: Date.now() + 3600
-                    }
+                    request.payload.email
                 )
             ]);
 
@@ -94,8 +91,16 @@ const register = function (server, serverOptions) {
 
             // send verification email
 
+            const document = {
+                user: {
+                    id: user._id
+                }
+            };
+
+            const keyHash = Jwt.sign(document, secret, { algorithm, expiresIn: '24h' });
+
             try {
-                await sendVerificationEmail(request.payload.email, keyHash.key);
+                await sendVerificationEmail(request.payload.email, keyHash);
             } catch (err) {
                 request.log(['mailer', 'error'], err);
             }
@@ -108,18 +113,18 @@ const register = function (server, serverOptions) {
 
             // create auth header
 
-            const credentials = `${session._id}:${session.key}`;
-            const authHeader = `Basic ${new Buffer(credentials).toString('base64')}`;
+            const { _id: uid, username, isActive } = user;
+            const { _id: sid, key } = session;
+
+            const credentials = {
+                scope: Object.keys(user.roles),
+                roles: user.roles,
+                session: { key, _id: sid },
+                user: { username, isActive, _id: uid }
+            };
 
             return {
-                user: {
-                    _id: user._id,
-                    username: user.username,
-                    email: user.email,
-                    roles: user.roles
-                },
-                session,
-                authHeader
+                authorization: Jwt.sign(credentials, secret, { algorithm })
             };
         }
     });
@@ -139,38 +144,41 @@ const register = function (server, serverOptions) {
             },
             pre: [
                 {
-                    assign: 'user',
-                    method: async ({ payload }, h) => {
+                    assign: 'jwt',
+                    method: ({ payload }, h) => {
 
-                        const user = await User.findOne({
-                            email: payload.email,
-                            'verify.expires': { $gt: Date.now() }
-                        });
+                        // validate verify token
 
-                        if (!user) {
-                            throw Boom.badRequest('Invalid email or key.');
+                        try {
+
+                            const document = Jwt.verify(payload.key, secret, { algorithms: [algorithm] });
+
+                            return document;
+
+                        } catch (err) {
+                            throw Boom.badRequest('Invalid key.');
                         }
-
-                        return user;
                     }
                 }
             ]
         },
-        handler: async ({ pre: { user }, payload }, h) => {
+        handler: async ({ pre: { jwt }, payload }, h) => {
 
-            if (!await Bcrypt.compare(payload.key, user.verify.token)) {
-                throw Boom.badRequest('Invalid email or key.');
-            }
+            const filter = {
+                _id: User.ObjectId(jwt.user._id),
+                email: payload.email
+            };
 
-            await User.findByIdAndUpdate(user._id, {
+            const update = {
                 $unset: { verify: undefined }
-            });
+            };
+
+            await User.findOneAndUpdate(filter, update);
 
             return { message: 'Success.' };
         }
     });
 
-    // TODO: can remove user pre and use `User.findOneAndUpdate` method
     server.route({
         method: 'POST',
         path: '/signup/resend-email',
@@ -188,7 +196,7 @@ const register = function (server, serverOptions) {
 
                         const user = await User.findOne({
                             email: payload.email,
-                            'verify.expires': { $lt: Date.now() }
+                            verify: false
                         });
 
                         if (!user) {
@@ -200,18 +208,15 @@ const register = function (server, serverOptions) {
                 }
             ]
         },
-        handler: async ({ pre, payload }, h) => {
+        handler: async ({ pre: { user }, payload }, h) => {
 
-            const { key, hash: token } = await Session.generateKeyHash();
-
-            await User.findByIdAndUpdate(pre.user._id, {
-                $set: {
-                    verify: {
-                        token,
-                        expires: Date.now() + 3600
-                    }
+            const document = {
+                user: {
+                    id: user._id
                 }
-            });
+            };
+
+            const key = Jwt.sign(document, secret, { algorithm, expiresIn: '24h' });
 
             await sendVerificationEmail(payload.email, key);
 
