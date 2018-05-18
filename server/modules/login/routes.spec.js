@@ -1,5 +1,6 @@
 'use strict';
 const Hapi = require('hapi');
+const Jwt = require('jsonwebtoken');
 const { expect } = require('code');
 const {
     describe,
@@ -19,6 +20,10 @@ const User = require('../user');
 const AuthAttempt = require('./auth-attempt');
 
 const Login = require('./routes');
+
+const Config = require('../../../config');
+
+const { secret, algorithm } = Config.get('/jwt');
 
 let server;
 
@@ -103,6 +108,13 @@ describe('POST /login', () => {
         expect(response.statusCode).to.equal(200);
         expect(response.result).to.be.an.object();
         expect(response.result.authorization).to.be.a.string();
+
+        const decoded = Jwt.verify(response.result.authorization, secret, { algorithms: [algorithm] });
+
+        expect(decoded.scope).to.be.a.array();
+        expect(decoded.roles).to.be.a.object();
+        expect(decoded.session).to.be.a.object();
+        expect(decoded.user).to.be.a.object();
     });
 });
 
