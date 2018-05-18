@@ -69,7 +69,6 @@ describe('GET /accounts', () => {
 
     let request;
 
-
     beforeEach(() => {
 
         request = {
