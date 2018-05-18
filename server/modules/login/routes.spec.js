@@ -98,7 +98,7 @@ describe('POST /login', () => {
 
     it('should return HTTP 200 when all is well', async () => {
 
-        const response = await server.inject(request); 
+        const response = await server.inject(request);
 
         expect(response.statusCode).to.equal(200);
         expect(response.result).to.be.an.object();
@@ -152,7 +152,6 @@ describe('POST /login/forgot', () => {
 
 describe('POST /login/reset', () => {
 
-    const User_findOne = User.findOne;
     const Mailer_sendEmail = Mailer.sendEmail;
     let request;
     let key;
@@ -189,17 +188,6 @@ describe('POST /login/reset', () => {
     afterEach(() => {
 
         Mailer.sendEmail = Mailer_sendEmail;
-        User.findOne = User_findOne;
-    });
-
-    it('should return HTTP 400 when the user query misses', async () => {
-
-        User.findOne = () => undefined;
-
-        const response = await server.inject(request);
-
-        expect(response.statusCode).to.equal(400);
-        expect(response.result.message).to.match(/invalid email or key/i);
     });
 
     it('should return HTTP 400 when the key match misses', async () => {
@@ -209,7 +197,7 @@ describe('POST /login/reset', () => {
         const response = await server.inject(request);
 
         expect(response.statusCode).to.equal(400);
-        expect(response.result.message).to.match(/invalid email or key/i);
+        expect(response.result.message).to.match(/invalid key/i);
     });
 
     it('should return HTTP 200 when all is well', async () => {

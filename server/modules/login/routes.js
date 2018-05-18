@@ -1,5 +1,4 @@
 'use strict';
-const Bcrypt = require('bcryptjs');
 const Boom = require('boom');
 const Joi = require('joi');
 
@@ -11,6 +10,8 @@ const Session = require('../session');
 const User = require('../user');
 
 const Jwt = require('jsonwebtoken');
+
+const { secret, algorithm } = Config.get('/jwt');
 
 const register = function (server, serverOptions) {
 
@@ -69,16 +70,14 @@ const register = function (server, serverOptions) {
                 }
             }]
         },
-        handler: function ({ pre }, h) {
+        handler: function ({ pre: { user, session } }, h) {
 
-            const { secret, algorithm } = Config.get('/jwt');
-
-            const { _id: uid, username, isActive } = pre.user;
-            const { _id: sid, key } = pre.session;
+            const { _id: uid, username, isActive } = user;
+            const { _id: sid, key } = session;
 
             const credentials = {
-                scope: Object.keys(pre.user.roles),
-                roles: pre.user.roles,
+                scope: Object.keys(user.roles),
+                roles: user.roles,
                 session: { key, _id: sid },
                 user: { username, isActive, _id: uid }
             };
@@ -117,31 +116,27 @@ const register = function (server, serverOptions) {
                 }
             }]
         },
-        handler: async function (request, h) {
+        handler: async function ({ pre, payload }, h) {
 
             // set reset token
 
-            const keyHash = await Session.generateKeyHash();
-            const update = {
-                $set: {
-                    resetPassword: {
-                        token: keyHash.hash,
-                        expires: Date.now() + 10000000
-                    }
+            const document = {
+                user: {
+                    id: pre.user._id
                 }
             };
 
-            await User.findByIdAndUpdate(request.pre.user._id, update);
+            const key = Jwt.sign(document, secret, { algorithm, expiresIn: '24h' });
 
             // send email
 
             const projectName = Config.get('/projectName');
             const emailOptions = {
                 subject: `Reset your ${projectName} password`,
-                to: request.payload.email
+                to: payload.email
             };
             const template = 'forgot-password';
-            const context = { key: keyHash.key };
+            const context = { key };
 
             await Mailer.sendEmail(emailOptions, template, context);
 
@@ -163,49 +158,41 @@ const register = function (server, serverOptions) {
                 }
             },
             pre: [{
-                assign: 'user',
-                method: async function (request, h) {
+                assign: 'jwt',
+                method: function ({ payload }, h) {
 
-                    const query = {
-                        email: request.payload.email,
-                        'resetPassword.expires': { $gt: Date.now() }
-                    };
-                    const user = await User.findOne(query);
+                    // validate reset token
 
-                    if (!user) {
-                        throw Boom.badRequest('Invalid email or key.');
+                    try {
+                        const document = Jwt.verify(payload.key, secret, { algorithms: [algorithm] });
+
+                        return document;
+
+                    } catch (err) {
+                        throw Boom.badRequest('Invalid key.');
                     }
-
-                    return user;
                 }
             }]
         },
-        handler: async function (request, h) {
-
-            // validate reset token
-
-            const key = request.payload.key;
-            const token = request.pre.user.resetPassword.token;
-            const keyMatch = await Bcrypt.compare(key, token);
-
-            if (!keyMatch) {
-                throw Boom.badRequest('Invalid email or key.');
-            }
+        handler: async function ({ pre: { jwt }, payload }, h) {
 
             // update user
 
-            const password = request.payload.password;
+            const password = payload.password;
             const passwordHash = await User.generatePasswordHash(password);
+
+            const filter = {
+                _id: User.ObjectId(jwt.user.id),
+                email: payload.email
+            };
+
             const update = {
                 $set: {
                     password: passwordHash.hash
-                },
-                $unset: {
-                    resetPassword: undefined
                 }
             };
 
-            await User.findByIdAndUpdate(request.pre.user._id, update);
+            await User.findOneAndUpdate(filter, update);
 
             return { message: 'Success.' };
         }
