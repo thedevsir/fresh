@@ -116,9 +116,11 @@ const register = function (server, serverOptions) {
             const { _id: uid, username, verify, isActive } = user;
             const { _id: sid, key } = session;
 
+            const roles = await user.hydrateRoles();
+
             const credentials = {
+                roles,
                 scope: Object.keys(user.roles),
-                roles: user.roles,
                 session: { key, _id: sid },
                 user: { username, verify, isActive, _id: uid }
             };
