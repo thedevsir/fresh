@@ -70,6 +70,11 @@ class Session extends MongoModels {
         return { key, hash };
     }
 
+    static async deleteUserSessions(userId) {
+
+        await Session.deleteMany({ userId });
+    }
+
     async updateLastActive() {
 
         const update = {
