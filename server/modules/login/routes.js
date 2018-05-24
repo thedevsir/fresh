@@ -72,14 +72,14 @@ const register = function (server, serverOptions) {
         },
         handler: function ({ pre: { user, session } }, h) {
 
-            const { _id: uid, username, isActive } = user;
+            const { _id: uid, username, verify, isActive } = user;
             const { _id: sid, key } = session;
 
             const credentials = {
                 scope: Object.keys(user.roles),
                 roles: user.roles,
                 session: { key, _id: sid },
-                user: { username, isActive, _id: uid }
+                user: { username, verify, isActive, _id: uid }
             };
 
             return {
