@@ -7,6 +7,7 @@ const Del = require('del');
 const Preware = require('../../../preware');
 
 const Account     = require('../../account');
+const Session     = require('../../session');
 const User        = require('../../user');
 const Status      = require('../../status');
 const NoteEntry   = require('../../shared/models/note-entry');
@@ -274,7 +275,8 @@ const register = function (server, serverOptions) {
 
             [account] = await Promise.all([
                 account.linkUser(`${user._id}`, user.username),
-                user.linkAccount(`${account._id}`, account.fullName())
+                user.linkAccount(`${account._id}`, account.fullName()),
+                Session.deleteUserSessions(`${user._id}`)
             ]);
 
             return account;
@@ -405,7 +407,8 @@ const register = function (server, serverOptions) {
 
             const [account] = await Promise.all([
                 request.pre.account.unlinkUser(),
-                request.pre.user.unlinkAccount()
+                request.pre.user.unlinkAccount(),
+                Session.deleteUserSessions(`${request.pre.user._id}`)
             ]);
 
             return account;

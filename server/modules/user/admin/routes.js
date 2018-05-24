@@ -7,6 +7,7 @@ const Preware = require('../../../preware');
 const User    = require('../user');
 const Admin   = require('../../admin-manage');
 const Account = require('../../account');
+const Session = require('../../session');
 
 const register = function (server, serverOptions) {
 
@@ -200,7 +201,8 @@ const register = function (server, serverOptions) {
 
             await Promise.all([
                 Account.findOneAndUpdate(queryByUserId, updateRole),
-                Admin.findOneAndUpdate(queryByUserId, updateRole)
+                Admin.findOneAndUpdate(queryByUserId, updateRole),
+                Session.deleteUserSessions(request.params.id)
             ]);
 
             return user;
@@ -231,6 +233,8 @@ const register = function (server, serverOptions) {
             if (!user) {
                 throw Boom.notFound('User not found.');
             }
+
+            await Session.deleteUserSessions(request.params.id);
 
             return { message: 'Success.' };
         }

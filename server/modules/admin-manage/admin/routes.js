@@ -6,6 +6,7 @@ const Preware = require('../../../preware');
 
 const Admin = require('../admin-manage');
 const User  = require('../../user');
+const Session  = require('../../session');
 
 const register = function (server, serverOptions) {
 
@@ -187,6 +188,10 @@ const register = function (server, serverOptions) {
                 throw Boom.notFound('Admin not found.');
             }
 
+            if (admin.user) {
+                await Session.deleteUserSessions(admin.user.id);
+            }
+
             return admin;
         }
     });
@@ -223,6 +228,10 @@ const register = function (server, serverOptions) {
 
             if (!admin) {
                 throw Boom.notFound('Admin not found.');
+            }
+
+            if (admin.user) {
+                await Session.deleteUserSessions(admin.user.id);
             }
 
             return admin;
@@ -293,7 +302,8 @@ const register = function (server, serverOptions) {
 
             [admin] = await Promise.all([
                 admin.linkUser(`${user._id}`, user.username),
-                user.linkAdmin(`${admin._id}`, admin.fullName())
+                user.linkAdmin(`${admin._id}`, admin.fullName()),
+                Session.deleteUserSessions(`${user._id}`)
             ]);
 
             return admin;
@@ -352,7 +362,8 @@ const register = function (server, serverOptions) {
 
             const [admin] = await Promise.all([
                 request.pre.admin.unlinkUser(),
-                request.pre.user.unlinkAdmin()
+                request.pre.user.unlinkAdmin(),
+                Session.deleteUserSessions(`${request.pre.user._id}`)
             ]);
 
             return admin;

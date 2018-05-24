@@ -7,6 +7,7 @@ const Preware = require('../../preware');
 const User = require('./user');
 const Admin = require('../admin-manage');
 const Account = require('../account');
+const Session = require('../session');
 
 const register = function (server, serverOptions) {
 
@@ -102,7 +103,8 @@ const register = function (server, serverOptions) {
             const [user] = await Promise.all([
                 User.findByIdAndUpdate(userId, updateUser, findOptions),
                 Account.findOneAndUpdate(queryByUserId, updateRole),
-                Admin.findOneAndUpdate(queryByUserId, updateRole)
+                Admin.findOneAndUpdate(queryByUserId, updateRole),
+                Session.deleteUserSessions(userId)
             ]);
 
             return user;
