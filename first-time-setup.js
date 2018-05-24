@@ -3,9 +3,9 @@ const MongoModels = require('mongo-models');
 const Promptly = require('promptly');
 
 const Account = require('./server/modules/account');
-const Admin = require('./server/modules/admin');
+const Admin = require('./server/modules/admin-manage');
 const AdminGroup = require('./server/modules/admin-group');
-const AuthAttempt = require('./server/modules/shared/models/auth-attempt');
+const AuthAttempt = require('./server/modules/login/auth-attempt');
 const Session = require('./server/modules/session');
 const Status = require('./server/modules/status');
 const User = require('./server/modules/user');
