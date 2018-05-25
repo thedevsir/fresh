@@ -63,42 +63,6 @@ describe('Preware', () => {
 
         server.route({
             method: 'GET',
-            path: '/limited/to/foo/permission',
-            options: {
-                auth,
-                pre: [
-                    Preware.requireAdminHavePermission('foo')
-                ]
-            },
-            handler
-        });
-
-        server.route({
-            method: 'GET',
-            path: '/limited/to/multiple/permissions',
-            options: {
-                auth,
-                pre: [
-                    Preware.requireAdminHavePermission(['foo', 'bar'])
-                ]
-            },
-            handler
-        });
-
-        server.route({
-            method: 'GET',
-            path: '/root/or/limited/to/foo/permission',
-            options: {
-                auth,
-                pre: [
-                    Preware.requireRootOrHavePermission('foo')
-                ]
-            },
-            handler
-        });
-
-        server.route({
-            method: 'GET',
             path: '/just/not/the/root/user',
             options: {
                 auth,
@@ -111,7 +75,7 @@ describe('Preware', () => {
 
         [rootCredentails, adminCredentials] = await Promise.all([
             Fixtures.Creds.createRootAdminUser(),
-            Fixtures.Creds.createAdminUser('Ren Hoek', 'ren', 'baddog', 'ren@stimpy.show', ['Sales'], ['Bar'])
+            Fixtures.Creds.createAdminUser('Ren Hoek', 'ren', 'baddog', 'ren@stimpy.show', ['Sales'])
         ]);
     });
 
@@ -139,42 +103,6 @@ describe('Preware', () => {
             method: 'GET',
             url: '/limited/to/multiple/groups',
             credentials: adminCredentials
-        };
-        const response = await server.inject(request);
-
-        expect(response.statusCode).to.equal(200);
-    });
-
-    it('should prevent access when permission misses', async () => {
-
-        const request = {
-            method: 'GET',
-            url: '/limited/to/foo/permission',
-            credentials: adminCredentials
-        };
-        const response = await server.inject(request);
-
-        expect(response.statusCode).to.equal(403);
-    });
-
-    it('should grant access when permission hits', async () => {
-
-        const request = {
-            method: 'GET',
-            url: '/limited/to/multiple/permissions',
-            credentials: adminCredentials
-        };
-        const response = await server.inject(request);
-
-        expect(response.statusCode).to.equal(200);
-    });
-
-    it('should grant access when permission misses but root requested', async () => {
-
-        const request = {
-            method: 'GET',
-            url: '/root/or/limited/to/foo/permission',
-            credentials: rootCredentails
         };
         const response = await server.inject(request);
 

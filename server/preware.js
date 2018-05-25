@@ -14,7 +14,8 @@ class Preware {
                 }
 
                 const admin = request.auth.credentials.roles.admin;
-                const groupFound = groups.some(group => admin.isMemberOf(group));
+                const groupFound = admin && admin.groups &&
+                Object.keys(admin.groups).some(group => groups.includes(group));
 
                 if (!groupFound) {
                     throw Boom.forbidden('Missing required group membership.');
@@ -24,88 +25,6 @@ class Preware {
             }
         };
     };
-
-    static requireAdminHavePermission(permissions) {
-
-        return {
-            assign: 'ensureAdminHavePermission',
-            method: async function (request, h) {
-
-                if (Object.prototype.toString.call(permissions) !== '[object Array]') {
-                    permissions = [permissions];
-                }
-
-                let permissionFound = false;
-                const admin = request.auth.credentials.roles.admin;
-
-                await new Promise((resolve) => {
-
-                    permissions.forEach(async (permission, idx, array) => {
-
-                        if (await admin.hasPermissionTo(permission)) {
-
-                            permissionFound = true;
-                            return resolve();
-                        }
-
-                        if (idx === array.length - 1) {
-                            resolve();
-                        }
-                    });
-                });
-
-                if (!permissionFound) {
-                    throw Boom.forbidden('Missing permissions.');
-                }
-
-                return h.continue;
-            }
-        };
-    }
-
-    static requireRootOrHavePermission(permissions) {
-
-        return {
-            assign: 'ensureRootOrHavePermission',
-            method: async function (request, h) {
-
-                const admin = request.auth.credentials.roles.admin;
-                const root = admin.isMemberOf('root');
-
-                if (root) {
-                    return h.continue;
-                }
-
-                if (Object.prototype.toString.call(permissions) !== '[object Array]') {
-                    permissions = [permissions];
-                }
-
-                let permissionFound = false;
-
-                await new Promise((resolve) => {
-
-                    permissions.forEach(async (permission, idx, array) => {
-
-                        if (await admin.hasPermissionTo(permission)) {
-
-                            permissionFound = true;
-                            return resolve();
-                        }
-
-                        if (idx === array.length - 1) {
-                            resolve();
-                        }
-                    });
-                });
-
-                if (!permissionFound) {
-                    throw Boom.forbidden('Missing permissions.');
-                }
-
-                return h.continue;
-            }
-        };
-    }
 
     static requireVerifiedUser() {
 
