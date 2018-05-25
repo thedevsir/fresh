@@ -1,4 +1,4 @@
-# Fresh API
+# Fresh API Build on JSON Web Tokens
 
 A user system API starter. Bring your own front-end.
 
