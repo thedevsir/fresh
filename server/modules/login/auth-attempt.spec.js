@@ -5,10 +5,8 @@ const Config = require('../../../config');
 const Fixtures = require('../../../test/fixtures');
 const Lab = require('lab');
 
-
 const lab = exports.lab = Lab.script();
 const config = Config.get('/hapiMongoModels/mongodb');
-
 
 lab.experiment('AuthAttempt Model', () => {
 
@@ -18,7 +16,6 @@ lab.experiment('AuthAttempt Model', () => {
         await Fixtures.Db.removeAllData();
     });
 
-
     lab.after(async () => {
 
         await Fixtures.Db.removeAllData();
@@ -26,12 +23,10 @@ lab.experiment('AuthAttempt Model', () => {
         AuthAttempt.disconnect();
     });
 
-
     lab.afterEach(async () => {
 
         await AuthAttempt.deleteMany({});
     });
-
 
     lab.test('it returns false when abuse is not detected', async () => {
 
@@ -39,7 +34,6 @@ lab.experiment('AuthAttempt Model', () => {
 
         Code.expect(result).to.equal(false);
     });
-
 
     lab.test('it detects login abuse from an ip and many users', async () => {
 
@@ -54,7 +48,6 @@ lab.experiment('AuthAttempt Model', () => {
         Code.expect(result).to.equal(true);
     });
 
-
     lab.test('it detects login abuse from an ip and one user', async () => {
 
         const attemptConfig = Config.get('/authAttempts');
@@ -67,7 +60,6 @@ lab.experiment('AuthAttempt Model', () => {
 
         Code.expect(result).to.equal(true);
     });
-
 
     lab.test('it returns a new instance when create succeeds', async () => {
 

@@ -19,14 +19,12 @@ describe('Admin Model', () => {
         await Fixtures.Db.removeAllData();
     });
 
-
     after(async () => {
 
         await Fixtures.Db.removeAllData();
 
         Admin.disconnect();
     });
-
 
     it('should parse names into name fields', () => {
 
@@ -43,7 +41,6 @@ describe('Admin Model', () => {
         expect(firstAndLast.last).to.equal('Höek');
     });
 
-
     it('should parse returns a full name', async () => {
 
         const admin = await Admin.create('Stan');
@@ -58,14 +55,12 @@ describe('Admin Model', () => {
         expect(name).to.equal('Ren Höek');
     });
 
-
     it('should return a new instance when create succeeds', async () => {
 
         const admin = await Admin.create('Ren Höek');
 
         expect(admin).to.be.an.instanceOf(Admin);
     });
-
 
     it('should return an instance when finding by username', async () => {
 
@@ -84,14 +79,12 @@ describe('Admin Model', () => {
         expect(account).to.be.an.instanceOf(Admin);
     });
 
-
     it('should return false when checking for membership when groups are missing', async () => {
 
         const admin = await Admin.create('Ren Höek');
 
         expect(admin.isMemberOf('sales')).to.equal(false);
     });
-
 
     it('should return false when permissions are missing', async () => {
 
@@ -100,7 +93,6 @@ describe('Admin Model', () => {
 
         expect(hasPermission).to.equal(false);
     });
-
 
     it('should return boolean values when the permission exists on the admin', async () => {
 
@@ -115,7 +107,6 @@ describe('Admin Model', () => {
 
         expect(hasPermission).to.equal(true);
     });
-
 
     it('should return boolean values when permission exits on the admin group', async () => {
 
@@ -171,7 +162,6 @@ describe('Admin Model', () => {
 
         expect(testB2).to.equal(false);
     });
-
 
     it('should link and unlink users', async () => {
 
