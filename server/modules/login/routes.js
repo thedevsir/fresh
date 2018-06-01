@@ -123,7 +123,9 @@ const register = function (server, serverOptions) {
 
             const document = {
                 user: {
-                    id: pre.user._id
+                    id: pre.user._id,
+                    email: pre.user.email,
+                    username: pre.user.username
                 }
             };
 
@@ -153,7 +155,6 @@ const register = function (server, serverOptions) {
             auth: false,
             validate: {
                 payload: {
-                    email: Joi.string().email().lowercase().required(),
                     key: Joi.string().required(),
                     password: Joi.string().required()
                 }
@@ -182,18 +183,13 @@ const register = function (server, serverOptions) {
             const password = payload.password;
             const passwordHash = await User.generatePasswordHash(password);
 
-            const filter = {
-                _id: User.ObjectId(jwt.user.id),
-                email: payload.email
-            };
-
             const update = {
                 $set: {
                     password: passwordHash.hash
                 }
             };
 
-            await User.findOneAndUpdate(filter, update);
+            await User.findByIdAndUpdate(jwt.user.id, update);
 
             return { message: 'Success.' };
         }

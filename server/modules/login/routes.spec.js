@@ -111,7 +111,6 @@ describe('POST /login', () => {
 
         const decoded = Jwt.verify(response.result.authorization, secret, { algorithms: [algorithm] });
 
-        expect(decoded.scope).to.be.a.array();
         expect(decoded.roles).to.be.a.object();
         expect(decoded.session).to.be.a.object();
         expect(decoded.user).to.be.a.object();
@@ -190,7 +189,6 @@ describe('POST /login/reset', () => {
             method: 'POST',
             url: '/login/reset',
             payload: {
-                email: 'ren@stimpy.show',
                 key,
                 password: 'badcat'
             }
