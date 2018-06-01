@@ -23,7 +23,7 @@ const register = function (server, serverOptions) {
             auth: false,
             validate: {
                 payload: {
-                    username: Joi.string().lowercase().required(),
+                    usernameOrEmail: Joi.string().lowercase().required(),
                     password: Joi.string().required()
                 }
             },
@@ -32,7 +32,7 @@ const register = function (server, serverOptions) {
                 method: async function (request, h) {
 
                     const ip = request.remoteAddress;
-                    const username = request.payload.username;
+                    const username = request.payload.usernameOrEmail;
                     const detected = await AuthAttempt.abuseDetected(ip, username);
 
                     if (detected) {
@@ -46,7 +46,7 @@ const register = function (server, serverOptions) {
                 method: async function (request, h) {
 
                     const ip = request.remoteAddress;
-                    const username = request.payload.username;
+                    const username = request.payload.usernameOrEmail;
                     const password = request.payload.password;
                     const user = await User.findByCredentials(username, password);
 

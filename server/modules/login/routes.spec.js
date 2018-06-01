@@ -67,7 +67,7 @@ describe('POST /login', () => {
             method: 'POST',
             url: '/login',
             payload: {
-                username: 'ren',
+                usernameOrEmail: 'ren',
                 password: 'baddog'
             }
         };
