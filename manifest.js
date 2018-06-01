@@ -184,6 +184,14 @@ const manifest = {
             request: ['error']
         },
         routes: {
+            validate: {
+                failAction: (request, h, err) => {
+
+                    if (err && err.isBoom && err.output.statusCode === 400) {
+                        return err;
+                    }
+                }
+            },
             files: { relativeTo: Config.get('/publicPath') },
             security: true
         },
