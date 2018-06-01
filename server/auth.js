@@ -23,6 +23,10 @@ const register = function (server, options) {
                     return { isValid: false };
                 }
 
+                if (credentials.roles.length > 0) {
+                    credentials.scope = Object.keys(credentials.roles);
+                }
+
                 session.updateLastActive();
 
                 return { credentials, isValid: true };

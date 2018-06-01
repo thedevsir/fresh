@@ -79,7 +79,6 @@ const register = function (server, serverOptions) {
 
             const credentials = {
                 roles,
-                scope: Object.keys(user.roles),
                 session: { key, _id: sid },
                 user: { username, verify, isActive, _id: uid }
             };
