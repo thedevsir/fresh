@@ -93,7 +93,9 @@ const register = function (server, serverOptions) {
 
             const document = {
                 user: {
-                    id: user._id
+                    id: user._id,
+                    username: user.username,
+                    email: user.email
                 }
             };
 
@@ -139,7 +141,6 @@ const register = function (server, serverOptions) {
             auth: false,
             validate: {
                 payload: {
-                    email: Joi.string().email().lowercase().required(),
                     key: Joi.string().required()
                 }
             },
@@ -165,16 +166,11 @@ const register = function (server, serverOptions) {
         },
         handler: async ({ pre: { jwt }, payload }, h) => {
 
-            const filter = {
-                _id: User.ObjectId(jwt.user._id),
-                email: payload.email
-            };
-
             const update = {
                 $unset: { verify: undefined }
             };
 
-            await User.findOneAndUpdate(filter, update);
+            await User.findByIdAndUpdate(jwt.user._id, update);
 
             return { message: 'Success.' };
         }
@@ -213,7 +209,9 @@ const register = function (server, serverOptions) {
 
             const document = {
                 user: {
-                    id: user._id
+                    id: user._id,
+                    username: user.username,
+                    email: user.email
                 }
             };
 

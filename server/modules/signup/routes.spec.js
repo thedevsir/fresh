@@ -157,13 +157,13 @@ describe('POST /signup', () => {
 describe('POST /signup/verify', () => {
 
     const Mailer_sendEmail = Mailer.sendEmail;
-    let findOneAndUpdate;
+    let findByIdAndUpdate;
     let request;
     let key;
 
     before(async () => {
 
-        findOneAndUpdate = Sinon.stub(User, 'findOneAndUpdate');
+        findByIdAndUpdate = Sinon.stub(User, 'findByIdAndUpdate');
 
         Mailer.sendEmail = (_, __, context) => {
 
@@ -181,7 +181,7 @@ describe('POST /signup/verify', () => {
 
     after(() => {
 
-        findOneAndUpdate.restore();
+        findByIdAndUpdate.restore();
     });
 
     beforeEach(() => {
@@ -190,8 +190,7 @@ describe('POST /signup/verify', () => {
             method: 'POST',
             url: `/signup/verify`,
             payload: {
-                key,
-                email: 'ren@stimpy.show'
+                key
             }
         };
     });
@@ -215,19 +214,14 @@ describe('POST /signup/verify', () => {
 
         const { user: { _id } } = Jwt.verify(key, secret, { algorithms: [algorithm] });
 
-        const expectedFilterQuery = {
-            _id,
-            email: 'ren@stimpy.show'
-        };
-
         const expectedUpdateQuery = {
             $unset: { verify: undefined }
         };
 
         const { statusCode, result } = await server.inject(request);
 
-        Sinon.assert.calledOnce(findOneAndUpdate);
-        // Sinon.assert.calledWithExactly(findOneAndUpdate.firstCall, expectedFilterQuery, expectedUpdateQuery);
+        Sinon.assert.calledOnce(findByIdAndUpdate);
+        // Sinon.assert.calledWithExactly(findByIdAndUpdate.firstCall, _id, expectedUpdateQuery);
 
         expect(statusCode).to.equal(200);
         expect(result.message).to.match(/success/i);
