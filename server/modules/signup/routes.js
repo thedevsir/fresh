@@ -181,6 +181,7 @@ const register = function (server, serverOptions) {
         path: '/signup/resend-email',
         options: {
             tags: ['api', 'signup'],
+            auth: false,
             validate: {
                 payload: {
                     email: Joi.string().email().lowercase().required()
