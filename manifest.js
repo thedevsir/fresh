@@ -46,6 +46,14 @@ const devPlugins = [
         plugin: 'vision'
     },
     {
+        plugin: 'lout'
+    }
+];
+
+const prodPlugins = [];
+
+const commonPlugins = [
+    {
         plugin: 'hapi-swagger',
         options: {
             securityDefinitions: {
@@ -112,14 +120,6 @@ More details on [Users, Roles & Groups](https://github.com/escommunity/fresh/wik
             ]
         }
     },
-    {
-        plugin: 'lout'
-    }
-];
-
-const prodPlugins = [];
-
-const commonPlugins = [
     {
         plugin: 'hapi-darwin'
     },
