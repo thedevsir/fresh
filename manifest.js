@@ -38,21 +38,18 @@ const devPlugins = [
                 ]
             }
         }
-    },
-    {
-        plugin: 'inert'
-    },
-    {
-        plugin: 'vision'
-    },
-    {
-        plugin: 'lout'
     }
 ];
 
 const prodPlugins = [];
 
 const commonPlugins = [
+    {
+        plugin: 'inert'
+    },
+    {
+        plugin: 'vision'
+    },
     {
         plugin: 'hapi-swagger',
         options: {
