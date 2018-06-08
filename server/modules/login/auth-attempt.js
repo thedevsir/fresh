@@ -20,11 +20,14 @@ class AuthAttempt extends MongoModels {
         Assert.ok(ip, 'Missing ip argument.');
         Assert.ok(username, 'Missing username argument.');
 
-        const [countByIp, countByIpAndUser] = await Promise.all([
-            this.count({ ip }),
-            this.count({ ip, username })
-        ]);
         const config = Config.get('/authAttempts');
+        const duration = new Date(Date.now() - config.durationOfBlocking * 60 * 60 * 1000);
+
+        const [countByIp, countByIpAndUser] = await Promise.all([
+            this.count({ ip, timeCreated: { $gt: duration } }),
+            this.count({ ip, username, timeCreated: { $gt: duration } })
+        ]);
+
         const ipLimitReached = countByIp >= config.forIp;
         const ipUserLimitReached = countByIpAndUser >= config.forIpAndUser;
 

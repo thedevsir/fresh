@@ -28,7 +28,8 @@ const config = {
     },
     authAttempts: {
         forIp: 50,
-        forIpAndUser: 7
+        forIpAndUser: 7,
+        durationOfBlocking: 24
     },
     jwt: {
         secret: {
