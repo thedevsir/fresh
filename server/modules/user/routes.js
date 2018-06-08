@@ -15,7 +15,9 @@ const register = function (server, serverOptions) {
         method: 'GET',
         path: '/users/my',
         options: {
-            tags: ['api', 'user'],
+            tags: ['api', 'users'],
+            description: 'Get the logged-in user\'s user details like roles. [User Account Scope]',
+            notes: 'Get the logged-in user\'s user details like roles.',
             auth: {
                 scope: ['admin', 'account']
             }
@@ -33,7 +35,9 @@ const register = function (server, serverOptions) {
         method: 'PUT',
         path: '/users/my',
         options: {
-            tags: ['api', 'user'],
+            tags: ['api', 'users'],
+            description: 'Update the logged-in user\'s user details like username and email. [User Account Scope]',
+            notes: 'Update the logged-in user\'s user details like username and email.',
             auth: {
                 scope: ['admin', 'account']
             },
@@ -115,7 +119,9 @@ const register = function (server, serverOptions) {
         method: 'PUT',
         path: '/users/my/password',
         options: {
-            tags: ['api', 'user'],
+            tags: ['api', 'users'],
+            description: 'Update the logged-in user\'s password. [User Account Scope]',
+            notes: 'Update the logged-in user\'s password.',
             auth: {
                 scope: ['admin', 'account']
             },

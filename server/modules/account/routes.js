@@ -12,7 +12,9 @@ const register = function (server, serverOptions) {
         method: 'GET',
         path: '/accounts/my',
         options: {
-            tags: ['api', 'account'],
+            tags: ['api', 'accounts'],
+            description: 'Get the logged-in user\'s account details. [User Account Scope]',
+            notes: 'Get the logged-in user\'s account details.',
             auth: {
                 scope: 'account'
             }
@@ -30,7 +32,9 @@ const register = function (server, serverOptions) {
         method: 'PUT',
         path: '/accounts/my',
         options: {
-            tags: ['api', 'account'],
+            tags: ['api', 'accounts'],
+            description: 'Update the logged-in user\'s account details. [User Account Scope]',
+            notes: 'Update your account details.',
             auth: {
                 scope: 'account'
             },
@@ -63,8 +67,9 @@ const register = function (server, serverOptions) {
         method: 'PUT',
         path: '/accounts/my/avatar',
         options: {
-            description: 'Upload account avatar image',
-            tags: ['api', 'account'],
+            description: 'Upload account avatar image. [User Account Scope]',
+            notes: 'Update your account details.',
+            tags: ['api', 'accounts'],
             auth: {
                 scope: 'account'
             },
@@ -104,8 +109,9 @@ const register = function (server, serverOptions) {
         method: 'DELETE',
         path: '/accounts/my/avatar',
         options: {
-            description: 'Delete account avatar image',
-            tags: ['api', 'account'],
+            description: 'Delete account avatar image. [User Account Scope]',
+            notes: 'Delete account avatar image.',
+            tags: ['api', 'accounts'],
             auth: {
                 scope: 'account'
             }

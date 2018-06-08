@@ -12,7 +12,9 @@ const register = function (server, serverOptions) {
         method: 'GET',
         path: '/statuses',
         options: {
-            tags: ['api', 'admin-status'],
+            tags: ['api', 'statuses'],
+            description: 'Get a paginated list of all statuses. [Root Scope]',
+            notes: 'Get a paginated list of all statuses.',
             auth: {
                 scope: 'admin'
             },
@@ -44,7 +46,9 @@ const register = function (server, serverOptions) {
         method: 'POST',
         path: '/statuses',
         options: {
-            tags: ['api', 'admin-status'],
+            tags: ['api', 'statuses'],
+            description: 'Add a new status. [Root Scope]',
+            notes: 'Add a new status.',
             auth: {
                 scope: 'admin'
             },
@@ -68,7 +72,14 @@ const register = function (server, serverOptions) {
         method: 'GET',
         path: '/statuses/{id}',
         options: {
-            tags: ['api', 'admin-status'],
+            tags: ['api', 'statuses'],
+            description: 'Get a status by ID. [Root Scope]',
+            notes: 'Get a status by ID.',
+            validate: {
+                params: {
+                    id : Joi.string().required().description('the id to get status')
+                }
+            },
             auth: {
                 scope: 'admin'
             },
@@ -92,13 +103,18 @@ const register = function (server, serverOptions) {
         method: 'PUT',
         path: '/statuses/{id}',
         options: {
-            tags: ['api', 'admin-status'],
+            tags: ['api', 'statuses'],
+            description: 'Update a status by ID. [Root Scope]',
+            notes: 'Update a status by ID.',
             auth: {
                 scope: 'admin'
             },
             validate: {
                 payload: {
                     name: Joi.string().required()
+                },
+                params: {
+                    id : Joi.string().required().description('the id to update a status')
                 }
             },
             pre: [
@@ -127,7 +143,14 @@ const register = function (server, serverOptions) {
         method: 'DELETE',
         path: '/statuses/{id}',
         options: {
-            tags: ['api', 'admin-status'],
+            tags: ['api', 'statuses'],
+            description: 'Delete a status by ID. [Root Scope]',
+            notes: 'Delete a status by ID.',
+            validate: {
+                params: {
+                    id : Joi.string().required().description('the id to delete a status')
+                }
+            },
             auth: {
                 scope: 'admin'
             },

@@ -20,6 +20,8 @@ const register = function (server, serverOptions) {
         path: '/login',
         options: {
             tags: ['api', 'login'],
+            description: 'Log in with username and password. [No Scope]',
+            notes: 'Log in with username and password.',
             auth: false,
             validate: {
                 payload: {
@@ -94,6 +96,8 @@ const register = function (server, serverOptions) {
         path: '/login/forgot',
         options: {
             tags: ['api', 'login'],
+            description: 'Trigger forgot password email. [No Scope]',
+            notes: 'Trigger forgot password email.',
             auth: false,
             validate: {
                 payload: {
@@ -152,6 +156,8 @@ const register = function (server, serverOptions) {
         path: '/login/reset',
         options: {
             tags: ['api', 'login'],
+            description: 'Reset password with forgot password key. [No Scope]',
+            notes: 'Reset password with forgot password key.',
             auth: false,
             validate: {
                 payload: {

@@ -20,6 +20,8 @@ const register = function (server, serverOptions) {
         path: '/signup',
         options: {
             tags: ['api', 'signup'],
+            description: 'Sign up for a new user account. [No Scope]',
+            notes: 'Sign up for a new user account. Creates a new User, new Account, and links the two.',
             auth: false,
             validate: {
                 payload: {
@@ -136,7 +138,8 @@ const register = function (server, serverOptions) {
         method: 'POST',
         path: '/signup/verify',
         options: {
-            description: 'Verify user e-mail with a key',
+            description: 'Verify user e-mail with a key. [No Scope]',
+            notes: 'Verify user e-mail with a key.',
             tags: ['api', 'signup'],
             auth: false,
             validate: {
@@ -181,6 +184,8 @@ const register = function (server, serverOptions) {
         path: '/signup/resend-email',
         options: {
             tags: ['api', 'signup'],
+            description: 'Re-send user verification key. [No Scope]',
+            notes: 'Re-send user verification key.',
             auth: false,
             validate: {
                 payload: {

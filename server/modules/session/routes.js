@@ -10,6 +10,8 @@ const register = function (server, serverOptions) {
         path: '/sessions/my',
         options: {
             tags: ['api', 'session'],
+            description: 'Get the logged-in user\'s session. [User Account Scope]',
+            notes: 'Get the logged-in user\'s session.',
             auth: {
                 scope: ['admin', 'account']
             }
@@ -28,7 +30,9 @@ const register = function (server, serverOptions) {
         method: 'DELETE',
         path: '/sessions/my/{id}',
         options: {
-            tags: ['api', 'session']
+            tags: ['api', 'session'],
+            description: 'Delete the logged-in user\'s session by ID. [User Account Scope]',
+            notes: 'Delete the logged-in user\'s session by ID.'
         },
         handler: async function (request, h) {
 

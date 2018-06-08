@@ -12,7 +12,9 @@ const register = function (server, serverOptions) {
         method: 'GET',
         path: '/sessions',
         options: {
-            tags: ['api', 'admin-session'],
+            tags: ['api', 'session'],
+            description: 'Get a paginated list of all user sessions. [Root Scope]',
+            notes: 'Get a paginated list of all user sessions.',
             auth: {
                 scope: 'admin'
             },
@@ -44,7 +46,14 @@ const register = function (server, serverOptions) {
         method: 'GET',
         path: '/sessions/{id}',
         options: {
-            tags: ['api', 'admin-session'],
+            tags: ['api', 'session'],
+            description: 'Get a user session by ID. [Root Scope]',
+            notes: 'Get a user session by ID.',
+            validate: {
+                params: {
+                    id : Joi.string().required().description('the id to get session')
+                }
+            },               
             auth: {
                 scope: 'admin'
             },
@@ -68,7 +77,14 @@ const register = function (server, serverOptions) {
         method: 'DELETE',
         path: '/sessions/{id}',
         options: {
-            tags: ['api', 'admin-session'],
+            tags: ['api', 'session'],
+            description: 'Delete a user session by ID. [Root Scope]',
+            notes: 'Delete a user session by ID.',
+            validate: {
+                params: {
+                    id : Joi.string().required().description('the id to delete a session')
+                }
+            },
             auth: {
                 scope: 'admin'
             },

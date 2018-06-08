@@ -7,6 +7,8 @@ const register = function (server, serverOptions) {
         path: '/',
         options: {
             tags: ['api', 'main'],
+            description: 'Test if API is accessible. [No Scope]',
+            notes: 'Test if API is accessible.',
             auth: false
         },
         handler: function (request, h) {

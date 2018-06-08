@@ -19,7 +19,9 @@ const register = function (server, serverOptions) {
         method: 'GET',
         path: '/accounts',
         options: {
-            tags: ['api', 'admin-account'],
+            tags: ['api', 'accounts'],
+            description: 'Get a paginated list of all customer accounts. [Admin Scope]',
+            notes: 'Get a paginated list of all customer accounts.',
             auth: {
                 scope: 'admin'
             },
@@ -48,7 +50,14 @@ const register = function (server, serverOptions) {
         method: 'GET',
         path: '/accounts/{id}',
         options: {
-            tags: ['api', 'admin-account'],
+            tags: ['api', 'accounts'],
+            description: 'Get a customer account by ID. [Admin Scope]',
+            notes: 'Get a customer account by ID.',
+            validate: {
+                params: {
+                    id : Joi.string().required().description('the id to get the account')
+                }
+            },
             auth: {
                 scope: 'admin'
             }
@@ -69,7 +78,9 @@ const register = function (server, serverOptions) {
         method: 'POST',
         path: '/accounts',
         options: {
-            tags: ['api', 'admin-account'],
+            tags: ['api', 'accounts'],
+            description: 'Create a new customer account. [Admin Scope]',
+            notes: 'Create a new customer account.',
             auth: {
                 scope: 'admin'
             },
@@ -89,13 +100,18 @@ const register = function (server, serverOptions) {
         method: 'POST',
         path: '/accounts/{id}/notes',
         options: {
-            tags: ['api', 'admin-account'],
+            tags: ['api', 'accounts'],
+            description: 'Add a new note on a customer account. [Admin Scope]',
+            notes: 'Add a new note on a customer account.',
             auth: {
                 scope: 'admin'
             },
             validate: {
                 payload: {
                     data: Joi.string().required()
+                },
+                params: {
+                    id : Joi.string().required().description('the id to add a new note onto an account')
                 }
             }
         },
@@ -129,13 +145,18 @@ const register = function (server, serverOptions) {
         method: 'POST',
         path: '/accounts/{id}/status',
         options: {
-            tags: ['api', 'admin-account'],
+            tags: ['api', 'accounts'],
+            description: 'Update customer account status by ID. [Admin Scope]',
+            notes: 'Update customer account status by ID.',
             auth: {
                 scope: 'admin'
             },
             validate: {
                 payload: {
                     status: Joi.string().required()
+                },
+                params: {
+                    id : Joi.string().required().description('the id to update an account status')
                 }
             },
             pre: [{
@@ -186,7 +207,9 @@ const register = function (server, serverOptions) {
         method: 'PUT',
         path: '/accounts/{id}',
         options: {
-            tags: ['api', 'admin-account'],
+            tags: ['api', 'accounts'],
+            description: 'Update a customer account by ID. [Admin Scope]',
+            notes: 'Update a customer account by ID.',
             auth: {
                 scope: 'admin'
             },
@@ -196,6 +219,9 @@ const register = function (server, serverOptions) {
                         first: Joi.string().required(),
                         last: Joi.string().required()
                     }).required()
+                },
+                params: {
+                    id : Joi.string().required().description('the id to update the account')
                 }
             }
         },
@@ -221,13 +247,18 @@ const register = function (server, serverOptions) {
         method: 'PUT',
         path: '/accounts/{id}/user',
         options: {
-            tags: ['api', 'admin-account'],
+            tags: ['api', 'accounts'],
+            description: 'Link a system user to a customer account. [Admin Scope]',
+            notes: 'Link a system user to a customer account.',
             auth: {
                 scope: 'admin'
             },
             validate: {
                 payload: {
                     username: Joi.string().lowercase().required()
+                },
+                params: {
+                    id : Joi.string().required().description('the id to link the account to a user')
                 }
             },
             pre: [{
@@ -287,8 +318,9 @@ const register = function (server, serverOptions) {
         method: 'PUT',
         path: '/accounts/{id}/avatar',
         options: {
-            description: 'Upload account avatar image',
-            tags: ['api', 'admin-account'],
+            description: 'Upload account avatar image. [Admin Scope]',
+            notes: 'Upload account avatar image.',
+            tags: ['api', 'accounts'],
             auth: {
                 scope: 'admin'
             },
@@ -343,7 +375,14 @@ const register = function (server, serverOptions) {
         method: 'DELETE',
         path: '/accounts/{id}',
         options: {
-            tags: ['api', 'admin-account'],
+            tags: ['api', 'accounts'],
+            description: 'Delete a customer account by ID. [Root Scope]',
+            notes: 'Delete a customer account by ID.',
+            validate: {
+                params: {
+                    id : Joi.string().required().description('the id to delete the account')
+                }
+            },
             auth: {
                 scope: 'admin'
             },
@@ -367,7 +406,14 @@ const register = function (server, serverOptions) {
         method: 'DELETE',
         path: '/accounts/{id}/user',
         options: {
-            tags: ['api', 'admin-account'],
+            tags: ['api', 'accounts'],
+            description: 'Unlink a system user to a customer account. [Admin Scope]',
+            notes: 'Unlink a system user to a customer account.',
+            validate: {
+                params: {
+                    id : Joi.string().required().description('the id to unlink a user to account')
+                }
+            },
             auth: {
                 scope: 'admin'
             },
@@ -419,8 +465,9 @@ const register = function (server, serverOptions) {
         method: 'DELETE',
         path: '/accounts/{id}/avatar',
         options: {
-            description: 'Delete account avatar image',
-            tags: ['api', 'admin-account'],
+            description: 'Delete account avatar image. [Admin Scope]',
+            notes: 'Delete account avatar image.',
+            tags: ['api', 'accounts'],
             auth: {
                 scope: 'admin'
             },

@@ -15,7 +15,9 @@ const register = function (server, serverOptions) {
         method: 'GET',
         path: '/users',
         options: {
-            tags: ['api', 'admin-user'],
+            tags: ['api', 'users'],
+            description: 'Get a paginated list of all users. [Root Scope]',
+            notes: 'Get a paginated list of all users.',
             auth: {
                 scope: 'admin'
             },
@@ -47,7 +49,9 @@ const register = function (server, serverOptions) {
         method: 'POST',
         path: '/users',
         options: {
-            tags: ['api', 'admin-user'],
+            tags: ['api', 'users'],
+            description: 'Create a new user. [Root Scope]',
+            notes: 'Create a new user. This does not map this user to an account.',
             auth: {
                 scope: 'admin'
             },
@@ -101,7 +105,14 @@ const register = function (server, serverOptions) {
         method: 'GET',
         path: '/users/{id}',
         options: {
-            tags: ['api', 'admin-user'],
+            tags: ['api', 'users'],
+            description: 'Get a user by ID. [Root Scope]',
+            notes: 'Get a user by ID.',
+            validate: {
+                params: {
+                    id : Joi.string().required().description('the id to get the user')
+                }
+            },
             auth: {
                 scope: 'admin'
             },
@@ -125,7 +136,9 @@ const register = function (server, serverOptions) {
         method: 'PUT',
         path: '/users/{id}',
         options: {
-            tags: ['api', 'admin-user'],
+            tags: ['api', 'users'],
+            description: 'Update a user by ID. [Root Scope]',
+            notes: 'Update a user by ID.',
             auth: {
                 scope: 'admin'
             },
@@ -213,7 +226,9 @@ const register = function (server, serverOptions) {
         method: 'DELETE',
         path: '/users/{id}',
         options: {
-            tags: ['api', 'admin-user'],
+            tags: ['api', 'users'],
+            description: 'Delete a user by ID. [Root Scope]',
+            notes: 'Delete a user by ID.',
             auth: {
                 scope: 'admin'
             },
@@ -244,7 +259,9 @@ const register = function (server, serverOptions) {
         method: 'PUT',
         path: '/users/{id}/password',
         options: {
-            tags: ['api', 'admin-user'],
+            tags: ['api', 'users'],
+            description: 'Update a user password. [Root Scope]',
+            notes: 'Update a user password.',
             auth: {
                 scope: 'admin'
             },
