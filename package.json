@@ -1,6 +1,7 @@
 {
   "name": "fresh",
-  "version": "1.1.0",
+  "version": "1.1.1",
+  "frameVersion": "13.4.4",
   "description": "A user system API starter",
   "main": "server.js",
   "scripts": {
