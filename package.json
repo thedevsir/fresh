@@ -14,7 +14,7 @@
   "author": "ECMA Community <escommunity.ir>",
   "license": "MIT",
   "engines": {
-    "node": "9.x.x"
+    "node": "8.x.x"
   },
   "dependencies": {
     "bcryptjs": "2.x.x",
